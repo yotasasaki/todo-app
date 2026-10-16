@@ -1,0 +1,75 @@
+<!doctype html>
+<!-- htmlの変数およびIDはkebab-caseで統一 -->
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ホーム - Todoアプリ</title>
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <a class="side-brand" href="/">
+          <strong>Todo App</strong>
+          <span>Todoアプリ</span>
+        </a>
+        <nav class="nav-list" aria-label="Todoフィルター">
+          <button class="nav-item active" data-filter="all">
+            <span class="nav-icon">☷</span>
+            <span>すべて</span>
+            <span class="badge"></span>
+          </button>
+          <button class="nav-item" data-filter="active">
+            <span class="nav-icon">◷</span>
+            <span>未完了</span>
+            <span class="badge"></span>
+          </button>
+          <button class="nav-item" data-filter="completed">
+            <span class="nav-icon">✓</span>
+            <span>完了済み</span>
+            <span class="badge"></span>
+          </button>
+          <button class="nav-item" data-filter="important">
+            <span class="nav-icon">☆</span>
+            <span>重要</span>
+            <span class="badge"></span>
+          </button>
+        </nav>
+      </aside>
+
+
+      <main class="page-shell">
+        <section class="card add-card">
+          <h2>新しいタスクを追加</h2>
+          <form class="add-form" id="todo-form">
+            <input id="todo-title" class="todo-input" type="text" placeholder="やることを入力してください..." autocomplete="off">
+            <select id="todo-priority">
+              <option value="low">低</option>
+              <option value="medium" selected>中</option>
+              <option value="high">高</option>
+            </select>
+            <select id="todo-category">
+              <option value="仕事">仕事</option>
+              <option value="学習" selected>学習</option>
+              <option value="健康">健康</option>
+            </select>
+            <input id="todo-date" class="date-input" type="date" value="2026-10-06">
+            <button class="add-button" type="submit"><span>＋</span>追加</button>
+          </form>
+        </section>
+
+        <section class="card task-card">
+          <div class="task-header">
+            <h2>タスク一覧</h2>
+          </div>
+
+        <!-- JS/FastAPIからデータを入れるためのコンテナ -->
+          <div id="todo-list"></div>
+        
+      </main>
+    </div>
+    <script src="/static/main.js"></script>
+  </body>
+</html>
+
