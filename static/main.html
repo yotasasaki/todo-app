@@ -1,75 +1,129 @@
 <!doctype html>
 <!-- htmlの変数およびIDはkebab-caseで統一 -->
 <html lang="ja">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ホーム - Todoアプリ</title>
-    <link rel="stylesheet" href="/static/style.css">
-  </head>
-  <body>
-    <div class="layout">
-      <aside class="sidebar">
-        <a class="side-brand" href="/">
-          <strong>Todo App</strong>
-          <span>Todoアプリ</span>
-        </a>
-        <nav class="nav-list" aria-label="Todoフィルター">
-          <button class="nav-item active" data-filter="all">
-            <span class="nav-icon">☷</span>
-            <span>すべて</span>
-            <span class="badge"></span>
-          </button>
-          <button class="nav-item" data-filter="active">
-            <span class="nav-icon">◷</span>
-            <span>未完了</span>
-            <span class="badge"></span>
-          </button>
-          <button class="nav-item" data-filter="completed">
-            <span class="nav-icon">✓</span>
-            <span>完了済み</span>
-            <span class="badge"></span>
-          </button>
-          <button class="nav-item" data-filter="important">
-            <span class="nav-icon">☆</span>
-            <span>重要</span>
-            <span class="badge"></span>
-          </button>
-        </nav>
-      </aside>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ホーム - Todoアプリ</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="side-brand" href="/">
+        <strong>Todo App</strong>
+        <span>Todoアプリ</span>
+      </a>
+      <nav class="nav-list" aria-label="Todoフィルター">
+        <button class="nav-item active" data-filter="all">
+          <span class="nav-icon">☷</span>
+          <span>すべて</span>
+          <span class="badge"></span>
+        </button>
+        <button class="nav-item" data-filter="active">
+          <span class="nav-icon">◷</span>
+          <span>未完了</span>
+          <span class="badge"></span>
+        </button>
+        <button class="nav-item" data-filter="completed">
+          <span class="nav-icon">✓</span>
+          <span>完了済み</span>
+          <span class="badge"></span>
+        </button>
+      </nav>
+    </aside>
 
 
-      <main class="page-shell">
+    <main class="page-shell">
+      <div class="top-content">
         <section class="card add-card">
           <h2>新しいタスクを追加</h2>
           <form class="add-form" id="todo-form">
             <input id="todo-title" class="todo-input" type="text" placeholder="やることを入力してください..." autocomplete="off">
-            <select id="todo-priority">
-              <option value="low">低</option>
-              <option value="medium" selected>中</option>
-              <option value="high">高</option>
-            </select>
-            <select id="todo-category">
-              <option value="仕事">仕事</option>
-              <option value="学習" selected>学習</option>
-              <option value="健康">健康</option>
-            </select>
-            <input id="todo-date" class="date-input" type="date" value="2026-10-06">
-            <button class="add-button" type="submit"><span>＋</span>追加</button>
+            <div class="form-bottom">
+              <select id="todo-priority">
+                <option value="low">低</option>
+                <option value="medium" selected>中</option>
+                <option value="high">高</option>
+              </select>
+              <select id="todo-category">
+                <option value="MMC-水島" selected>MMC-水島</option>
+                <option value="MMC-岡崎">MMC-岡崎</option>
+                <option value="MMC-MMTH">MMC-MMTH</option>
+                <option value="MMC-MMKI">MMC-MMKI</option>
+                <option value="MMC-MMM">MMC-MMM</option>
+                <option value="ISUZU-US">ISUZU-US</option>
+                <option value="ISUZU-藤沢">ISUZU-藤沢</option>
+                <option value="その他">その他</option>
+              </select>
+              <input id="todo-date" class="date-input" type="date">
+              <button class="add-button" type="submit"><span>＋</span>追加</button>
+            </div>
           </form>
         </section>
 
-        <section class="card task-card">
-          <div class="task-header">
-            <h2>タスク一覧</h2>
+        <section class="card weather-card">
+          <h2>今日の天気</h2>
+          <div class="weather-area-switch">
+            <button class="weather-area active" data-filter="平塚">
+              <span>平塚</span>
+            </button>
+            <button class="weather-area" data-filter="大崎">
+              <span>大崎</span>
+            </button>
           </div>
+          
+          <span></span>
+          <span></span>
+          <div class="weather-hourly-card"></div>
 
-        <!-- JS/FastAPIからデータを入れるためのコンテナ -->
-          <div id="todo-list"></div>
-        
-      </main>
-    </div>
-    <script src="/static/main.js"></script>
-  </body>
+
+        </section>
+
+      </div>
+
+      <!-- JS/FastAPIからデータを入れるためのコンテナ -->
+      <div id="todo-list"></div>
+
+      <div class="category-section-mizushima">
+        <h2>MMC-水島</h2>
+        <div id="mmc-mizushima-list"></div>
+      </div>
+      <div class="category-section-okazaki">
+        <h2>MMC-岡崎</h2>
+        <div id="mmc-okazaki-list"></div>
+      </div>
+      <div class="category-section-mmth">
+        <h2>MMC-MMTH</h2>
+        <div id="mmc-mmth-list"></div>
+      </div>
+      <div class="category-section-mmki">
+        <h2>MMC-MMKI</h2>
+        <div id="mmc-mmki-list"></div>
+      </div>
+      <div class="category-section-mmm">
+        <h2>MMC-MMM</h2>
+        <div id="mmc-mmm-list"></div>
+      </div>
+      <div class="category-section-isuzu-us">
+        <h2>ISUZU-US</h2>
+        <div id="isuzu-us-list"></div>
+      </div>
+      <div class="category-section-isuzu-fujisawa">
+        <h2>ISUZU-藤沢</h2>
+        <div id="isuzu-fujisawa-list"></div>
+      </div>
+      <div class="category-section-others">
+        <h2>その他</h2>
+        <div id="others-list"></div>
+      </div>
+
+
+    </main>
+  </div>
+  <script src="/static/main.js"></script>
+</body>
+
 </html>
-

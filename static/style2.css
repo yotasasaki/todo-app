@@ -1,0 +1,583 @@
+/* =========================
+   基本設定
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans JP",
+    sans-serif;
+
+  color: #172033;
+  background: #f4f7fc;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f7f9fd 0%, #edf3fb 100%);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+
+/* =========================
+   全体レイアウト
+========================= */
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+
+/* =========================
+   サイドバー
+========================= */
+
+.sidebar {
+  min-height: 100vh;
+  padding: 28px 20px;
+  background: #fbfcff;
+  border-right: 1px solid #e7edf6;
+}
+
+
+
+/* ロゴ */
+
+.side-brand {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 32px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+}
+
+.side-brand strong {
+  color: #176de5;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.side-brand span {
+  color: #7b8799;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+
+/* ナビゲーション */
+
+.nav-list {
+  display: grid;
+  gap: 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 68px;
+  gap: 18px;
+  padding: 0 18px;
+
+  border: 0;
+  border-radius: 14px;
+
+  background: transparent;
+  color: #182338;
+
+  font-size: 21px;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background: #f0f5fc;
+}
+
+.nav-item.active {
+  color: #176de5;
+  background: #e8f1ff;
+}
+
+.nav-icon {
+  width: 28px;
+  font-size: 28px;
+  text-align: center;
+}
+
+.badge {
+  min-width: 38px;
+  margin-left: auto;
+  padding: 5px 10px;
+
+  border-radius: 12px;
+  background: #edf1f7;
+
+  text-align: center;
+  font-size: 16px;
+}
+
+.nav-item.active .badge {
+  background: #bcd6ff;
+}
+
+
+/* =========================
+   メイン
+========================= */
+
+.page-shell {
+  width: 100%;
+  min-width: 0;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+
+/* =========================
+   カード
+========================= */
+
+.top-content {
+    
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+    gap: 10px;
+    margin-bottom: 30px;
+
+}
+
+
+
+.card {
+  
+  padding: 24px;
+
+  border: 1px solid #e6ebf3;
+  border-radius: 16px;
+
+  background: #fff;
+
+  box-shadow: 0 8px 25px rgba(47, 72, 110, 0.04);
+}
+
+.add-card {
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+
+
+.card h2 {
+  margin: 0 0 22px;
+  font-size: 27px;
+}
+
+
+
+
+
+
+/* =========================
+   Todo追加フォーム
+========================= */
+
+.add-form {
+  display: flex;
+  gap: 14px;
+  flex-direction: column;
+}
+.form-bottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.todo-input,
+.date-input,
+.add-form select {
+  height: 60px;
+
+  border: 1px solid #d8e0ec;
+  border-radius: 12px;
+
+  background: #fff;
+  color: #263248;
+
+  outline: none;
+}
+
+.todo-input {
+ 
+ 
+  padding: 0 12px;
+  font-size: 15px;
+}
+
+.add-form select {
+  min-width: 80px;
+  padding: 0 12px;
+}
+
+.date-input {
+  width: 245px;
+  padding: 0 16px;
+  font-size: 16px;
+}
+
+.todo-input:focus,
+.date-input:focus,
+.add-form select:focus {
+  border-color: #4d91ee;
+  box-shadow: 0 0 0 3px rgba(39, 119, 237, 0.12);
+}
+
+/* =========================
+   天気予報カード
+========================= */
+
+.card.weather-card{
+  min-width: 0;
+  width: 100%;
+}
+
+
+.weather-hourly-card{
+  display:flex;
+  flex-direction:row;
+  overflow-x:auto;
+  gap:12px;
+  width: 100%;
+ 
+
+}
+.weather-hourly-card-each{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+
+
+
+
+
+/* 追加ボタン */
+
+.add-button {
+  height: 60px;
+  min-width: 145px;
+
+  border: 0;
+  border-radius: 12px;
+
+  color: #fff;
+  background: #2777ed;
+
+  font-weight: 700;
+  font-size: 18px;
+
+  box-shadow: 0 8px 18px rgba(39, 119, 237, 0.22);
+}
+
+.add-button:hover {
+  background: #176de5;
+}
+
+.add-button span {
+  margin-right: 5px;
+  font-size: 25px;
+}
+
+/* =========================
+   カテゴリ分類名
+========================= */
+
+.category-section-mizushima h2,
+.category-section-okazaki h2,
+.category-section-mmth h2,
+.category-section-mmki h2,
+.category-section-mmm h2,
+.category-section-isuzu-us h2,
+.category-section-isuzu-fujisawa h2,
+.category-section-others h2 {
+    margin: 0 0 12px;
+    padding: 24px 18px;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    border-left: 6px solid;
+    border-radius: 10px;
+}
+
+.category-section-mizushima,
+.category-section-okazaki,
+.category-section-mmth,
+.category-section-mmki,
+.category-section-mmm,
+.category-section-isuzu-us,
+.category-section-isuzu-fujisawa,
+.category-section-others {
+    margin-bottom: 18px;
+}
+
+.category-section-mizushima h2 {
+    border-left-color: #3478f6;
+    background-color: #edf3ff;
+}
+
+/* MMC-岡崎：緑 */
+.category-section-okazaki h2 {
+    border-left-color: #19b99a;
+    background-color: #eaf9f4;
+}
+
+/* MMC-MMTH：紫 */
+.category-section-mmth h2 {
+    border-left-color: #a855f7;
+    background-color: #f5edff;
+}
+
+/* MMC-MMKI：オレンジ */
+.category-section-mmki h2 {
+    border-left-color: #efa338;
+    background-color: #fff6e7;
+}
+
+/* MMC-MMM：ピンク */
+.category-section-mmm h2 {
+    border-left-color: #f06b83;
+    background-color: #fff0f3;
+}
+
+/* ISUZU-US：青 */
+.category-section-isuzu-us h2 {
+    border-left-color: #3478f6;
+    background-color: #edf3ff;
+}
+
+/* ISUZU-藤沢：緑 */
+.category-section-isuzu-fujisawa h2 {
+    border-left-color: #19b99a;
+    background-color: #eaf9f4;
+}
+
+/* その他：紫 */
+.category-section-others h2 {
+    border-left-color: #a855f7;
+    background-color: #f5edff;
+}
+
+/* =========================
+   タスク一覧
+========================= */
+
+.task-card {
+  margin-bottom: 24px;
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+/* Todo一覧 */
+
+#todo-list {
+  display: grid;
+  gap: 10px;
+}
+
+.category-section-mizushima > div,
+.category-section-okazaki > div,
+.category-section-mmth > div,
+.category-section-mmki > div,
+.category-section-mmm > div,
+.category-section-isuzu-us > div,
+.category-section-isuzu-fujisawa > div,
+.category-section-others > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+
+/* =========================
+   Todo 1件
+========================= */
+
+.todo-item {
+  display: flex;
+  align-items: center;
+
+  min-height: 72px;
+  gap: 16px;
+  padding: 0 18px;
+
+  border: 1px solid #e4e9f1;
+  border-radius: 13px;
+
+  background: #fff;
+}
+
+.todo-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+}
+
+
+
+
+/* 完了済み .todo-title*/
+
+.todo-item.completed{
+  background-color: #f0f1f3;
+  color: #7f8999;
+  text-decoration: line-through;
+}
+
+
+/* =========================
+   チェックボックス
+========================= */
+
+
+
+
+
+/* =========================
+   優先度
+========================= */
+
+.priority {
+  min-width: 70px;
+  padding: 5px 12px;
+
+  border-radius: 999px;
+
+  text-align: center;
+  font-size: 13px;
+}
+
+.priority.important {
+  color: #ed5151;
+  background: #ffe5e5;
+}
+
+.priority.empty {
+  visibility: hidden;
+}
+
+
+/* =========================
+   期限
+========================= */
+
+.todo-date {
+  width: 145px;
+  color: #768297;
+  font-size: 15px;
+}
+
+
+/* =========================
+   操作ボタン
+========================= */
+
+
+
+
+/*編集時にhiddenが適用されるように入れたが一旦コメントアウト*/
+/*
+[hidden] {
+    display: none !important;
+}
+*/
+
+/* =========================
+   スマホ対応
+========================= */
+
+@media (max-width: 900px) {
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    min-height: auto;
+    padding: 20px;
+    border-right: 0;
+    border-bottom: 1px solid #e7edf6;
+  }
+
+  .side-brand {
+    margin-bottom: 20px;
+  }
+
+  .nav-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .nav-item {
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .nav-item span:nth-child(2) {
+    display: none;
+  }
+
+  .badge {
+    margin-left: 0;
+  }
+
+  .page-shell {
+    width: calc(100% - 24px);
+    padding: 20px 0 30px;
+  }
+
+  .add-form {
+    flex-wrap: wrap;
+  }
+
+  .todo-input {
+    flex-basis: 100%;
+  }
+
+  .date-input,
+  .add-button {
+    flex: 1;
+    width: auto;
+  }
+
+  .todo-date {
+    display: none;
+  }
+}
