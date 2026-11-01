@@ -13,25 +13,26 @@
   <div class="layout">
     <aside class="sidebar">
       <a class="side-brand" href="/">
-        <strong>Todo App</strong>
-        <span>Todoアプリ</span>
+        <strong>Manage App</strong>
+        <span>Manageアプリ</span>
       </a>
       <nav class="nav-list" aria-label="Todoフィルター">
-        <button class="nav-item active" data-filter="all">
-          <span class="nav-icon">☷</span>
-          <span>すべて</span>
-          <span class="badge"></span>
-        </button>
-        <button class="nav-item" data-filter="active">
+        <a class="nav-item active" data-filter="">
           <span class="nav-icon">◷</span>
-          <span>未完了</span>
-          <span class="badge"></span>
-        </button>
-        <button class="nav-item" data-filter="completed">
+          <span>todo アプリ</span>
+          
+        </a>
+        <a class="nav-item" data-filter="">
+          <span class="nav-icon">☷</span>
+          <span>Recipe アプリ</span>
+          
+        </a>
+
+        <a class="nav-item" data-filter="">
           <span class="nav-icon">✓</span>
-          <span>完了済み</span>
-          <span class="badge"></span>
-        </button>
+          <span>English アプリ</span>
+          
+        </a>
       </nav>
     </aside>
 
@@ -66,59 +67,101 @@
 
         <section class="card weather-card">
           <h2>今日の天気</h2>
-          <div class="weather-area-switch">
-            <button class="weather-area active" data-filter="平塚">
-              <span>平塚</span>
+          <div class="weather-current">
+            <div class="weather-area-switch">
+              <button class="weather-area active" data-filter="平塚">
+                <span>平塚</span>
+              </button>
+              <button class="weather-area" data-filter="大崎">
+                <span>大崎</span>
+              </button>
+            </div>
+            <div class="weather-current-info">
+              <span class="weather-current-icon"></span>
+              <div class="weather-current-details">
+                <span class="weather-current-temp"></span>
+                <span class="weather-current-description"></span>
+
+              </div>
+            </div>
+
+          </div>
+
+          <div class="weather-span-switch">
+            <button class="weather-span active" data-filter="時間別">
+              <span>時間別</span>
             </button>
-            <button class="weather-area" data-filter="大崎">
-              <span>大崎</span>
+            <button class="weather-span" data-filter="週間">
+              <span>週間</span>
             </button>
           </div>
-          
-          <span></span>
-          <span></span>
+
+
+
+
           <div class="weather-hourly-card"></div>
+          <div class="weather-weekly-card" hidden></div>
 
 
         </section>
 
       </div>
 
-      <!-- JS/FastAPIからデータを入れるためのコンテナ -->
-      <div id="todo-list"></div>
+      <!--フィルター切り替えのためのボタンをここに配置 -->
+        <div class="item-state-switch">
+          <button class="item-state active" data-filter="active">
+            <span class="item-state-icon">◷</span>
+            <span>未完了</span>
+            <span class="badge"></span>
+          </button>
+          <button class="item-state" data-filter="all">
+            <span class="item-state-icon">☷</span>
+            <span>すべて</span>
+            <span class="badge"></span>
+          </button>
 
-      <div class="category-section-mizushima">
-        <h2>MMC-水島</h2>
-        <div id="mmc-mizushima-list"></div>
-      </div>
-      <div class="category-section-okazaki">
-        <h2>MMC-岡崎</h2>
-        <div id="mmc-okazaki-list"></div>
-      </div>
-      <div class="category-section-mmth">
-        <h2>MMC-MMTH</h2>
-        <div id="mmc-mmth-list"></div>
-      </div>
-      <div class="category-section-mmki">
-        <h2>MMC-MMKI</h2>
-        <div id="mmc-mmki-list"></div>
-      </div>
-      <div class="category-section-mmm">
-        <h2>MMC-MMM</h2>
-        <div id="mmc-mmm-list"></div>
-      </div>
-      <div class="category-section-isuzu-us">
-        <h2>ISUZU-US</h2>
-        <div id="isuzu-us-list"></div>
-      </div>
-      <div class="category-section-isuzu-fujisawa">
-        <h2>ISUZU-藤沢</h2>
-        <div id="isuzu-fujisawa-list"></div>
-      </div>
-      <div class="category-section-others">
-        <h2>その他</h2>
-        <div id="others-list"></div>
-      </div>
+          <button class="item-state" data-filter="completed">
+            <span class="item-state-icon">✓</span>
+            <span>完了済み</span>
+            <span class="badge"></span>
+          </button>
+        </div>
+
+        <!-- JS/FastAPIからデータを入れるためのコンテナ -->
+        <div id="todo-list"></div>
+
+        <div class="category-section-mizushima">
+          <h2>MMC-水島</h2>
+          <div id="mmc-mizushima-list"></div>
+        </div>
+        <div class="category-section-okazaki">
+          <h2>MMC-岡崎</h2>
+          <div id="mmc-okazaki-list"></div>
+        </div>
+        <div class="category-section-mmth">
+          <h2>MMC-MMTH</h2>
+          <div id="mmc-mmth-list"></div>
+        </div>
+        <div class="category-section-mmki">
+          <h2>MMC-MMKI</h2>
+          <div id="mmc-mmki-list"></div>
+        </div>
+        <div class="category-section-mmm">
+          <h2>MMC-MMM</h2>
+          <div id="mmc-mmm-list"></div>
+        </div>
+        <div class="category-section-isuzu-us">
+          <h2>ISUZU-US</h2>
+          <div id="isuzu-us-list"></div>
+        </div>
+        <div class="category-section-isuzu-fujisawa">
+          <h2>ISUZU-藤沢</h2>
+          <div id="isuzu-fujisawa-list"></div>
+        </div>
+        <div class="category-section-others">
+          <h2>その他</h2>
+          <div id="others-list"></div>
+        </div>
 
 
     </main>

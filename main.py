@@ -109,7 +109,7 @@ def get_count(db:Session=Depends(get_db)):
 # 05 天気API
 # 指定された場所の天気情報を外部APIから取得して返す
 @app.get("/api/get-weather")
-def get_weather(location:str):
+def get_weather(location:str,span:str):
     if location=="平塚":
         latitude=35.33
         longitude=139.35
@@ -117,23 +117,23 @@ def get_weather(location:str):
         latitude=35.62
         longitude=139.73
         
-    
-    
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
-    "latitude": latitude,
-    "longitude": longitude,
-    "hourly": "temperature_2m,weather_code",
-    "current":"temperature_2m,weather_code",
-    "timezone": "Asia/Tokyo"
-    }
+        "latitude": latitude,
+        "longitude": longitude,
+        "hourly": "weather_code,temperature_2m,precipitation_probability",
+        "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+        "current":"temperature_2m,weather_code",
+        "timezone": "Asia/Tokyo",
+        "forecast_days":7,
+        }
+    
     response=requests.get(url,params=params)
-    print(response.request.url)
     data=response.json()
-    print(data)
     print(f"現在の温度:{data['current']['temperature_2m']}")
     print(f"現在の天気:{data['current']['weather_code']}")
     print(f"時間ごと:{data['hourly']}")
+    print(f"週間天気:{data['daily']['weather_code']}")
     return{
         "data":data
     }

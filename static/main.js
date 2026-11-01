@@ -4,20 +4,20 @@
 
 
 //01　初期設定・共通変数
-let currentFilter = "all";
+let currentFilter = "active";
 
 //02　Todo関連の関数
 //タスクの数をカウントし、各ナビゲーションに表示
 async function CountTodos() {
-    const navs = document.querySelectorAll(".nav-item");
+    const navs = document.querySelectorAll(".item-state");
 
     const response = await fetch("/api/count", {
         method: "GET"
     });
     const countTodos = await response.json();
-    navs[0].querySelector(".badge").textContent = countTodos.count_all;
-    navs[1].querySelector(".badge").textContent = countTodos.count_completed;
-    navs[2].querySelector(".badge").textContent = countTodos.count_not_completed;
+    navs[0].querySelector(".badge").textContent = countTodos.count_not_completed;
+    navs[1].querySelector(".badge").textContent = countTodos.count_all;
+    navs[2].querySelector(".badge").textContent = countTodos.count_completed;
 
 
 
@@ -180,12 +180,11 @@ async function editTodo(todoId) {
 
 //03　天気関連の関数
 //天気情報を取得して表示
-async function getWeather(location) {
-    const response = await fetch(`/api/get-weather/?location=${location}`, {
+async function getWeather(location, span) {
+    const response = await fetch(`/api/get-weather/?location=${location}&span=${span}`, {
         method: "GET"
     });
     const weather = await response.json();
-    console.log(weather.data.hourly);
     const weatherIcons = {
         0: ["☀️", "快晴"],
         1: ["🌤️", "おおむね晴れ"],
@@ -216,45 +215,105 @@ async function getWeather(location) {
         96: ["⛈️", "雹を伴う雷雨"],
         99: ["⛈️", "強い雹を伴う雷雨"]
     };
-    const weatherCard = document.querySelector(".card.weather-card");
-    const weatherForecast=weatherCard.querySelectorAll("span");
-    weatherForecast[2].textContent=weatherIcons[weather.data.current.weather_code][0];
-    weatherForecast[3].textContent=weather.data.current.temperature_2m;
+    const weatherCurrentInfo = document.querySelector(".weather-current-info");
+    const weatherCurrentInfoSpan = weatherCurrentInfo.querySelectorAll("span");
+    weatherCurrentInfoSpan[0].textContent = weatherIcons[weather.data.current.weather_code][0];
+    weatherCurrentInfoSpan[1].textContent = weather.data.current.temperature_2m;
+    weatherCurrentInfoSpan[2].textContent = weatherIcons[weather.data.current.weather_code][1];
     const weatherHourlyCard = document.querySelector(".weather-hourly-card");
-    weatherHourlyCard.innerHTML = "";
-    for(let i=0;i<24;i++){
-        weatherHourlyCard.innerHTML+=`
+    const weatherWeeklyCard = document.querySelector(".weather-weekly-card");
+
+    if (span == "時間別") {
+        weatherHourlyCard.hidden=false;
+        weatherWeeklyCard.hidden=true;
+        
+        weatherHourlyCard.innerHTML = "";
+        for (let i = 0; i < 24; i++) {
+            weatherHourlyCard.innerHTML += `
         <div class="weather-hourly-card-each">
          <span>${weather.data.hourly.time[i].slice(11, 16)}</span>
          <span>${weatherIcons[weather.data.hourly.weather_code[i]][0]}</span>
          <span>${weather.data.hourly.temperature_2m[i]}</span>
+         <span>${weather.data.hourly.precipitation_probability[i]}%</span>
         </div>
         `
+        }
+
+
+    }else if(span=="週間"){
+        weatherHourlyCard.hidden=true;
+        weatherWeeklyCard.hidden=false;
+
+        
+
+        
+        weatherWeeklyCard.innerHTML = "";
+        for (let i = 0; i < 7; i++) {
+            const date = weather.data.daily.time[i];
+            const day = new Date(`${date}T00:00:00`).getDay();
+
+            const dayNames = ["日", "月", "火", "水", "木", "金", "土"];
+            weatherWeeklyCard.innerHTML += `
+        <div class="weather-weekly-card-each">
+         <span class="weekly-day day-${day}">${dayNames[day]}</span>
+         <span class="weekly-date">${date.slice(5).replace("-", "/")}</span>
+         <span class="weekly-icon">${weatherIcons[weather.data.daily.weather_code[i]][0]}</span>
+         <span class="weekly-description">${weatherIcons[weather.data.daily.weather_code[i]][1]}</span>
+         
+         <span class="weekly-temp-min">${weather.data.daily.temperature_2m_min[i]}°</span>
+         <span class="weekly-temp-max">${weather.data.daily.temperature_2m_max[i]}°</span>
+         
+         <span class="weekly-rain">${weather.data.daily.precipitation_probability_max[i]}%</span>
+        </div>
+        `
+        }
+
+
     }
-    
+
+
 }
 
 
 //04　イベント登録
 //大崎と平塚の天気をスイッチ(activeクラス付与)
-const weatherAreas=document.querySelectorAll(".weather-area");
-weatherAreas.forEach(button=>{
-    button.addEventListener("click",()=>{
-        weatherAreas.forEach(item=>{
+const weatherAreas = document.querySelectorAll(".weather-area");
+weatherAreas.forEach(button => {
+    button.addEventListener("click", () => {
+        weatherAreas.forEach(item => {
             item.classList.remove("active")
         })
         button.classList.add("active")
 
-        getWeather(button.dataset.filter)
+        const activeSpan=document.querySelector(".weather-span.active")
+        getWeather(button.dataset.filter,activeSpan.dataset.filter)
 
 
     })
 
 })
+
+const weatherSpans = document.querySelectorAll(".weather-span");
+weatherSpans.forEach(button => {
+    button.addEventListener("click", () => {
+        weatherSpans.forEach(item => {
+            item.classList.remove("active")
+        })
+        button.classList.add("active")
+
+        const activeLocation=document.querySelector(".weather-area.active")
+        getWeather(activeLocation.dataset.filter,button.dataset.filter)
+
+
+
+    })
+})
+
 //新規FormをHttp Postで送る
 const todoForm = document.querySelector("#todo-form")
 todoForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+    
+    event.preventDefault();//これによりページを再読み込みせずに処理できる、ユーザーが操作している画面を維持したまま、必要なデータだけ更新できるというのがメリット。
     const title = document.querySelector("#todo-title").value;
     const priority = document.querySelector("#todo-priority").value;
     const category = document.querySelector("#todo-category").value;
@@ -273,7 +332,7 @@ todoForm.addEventListener("submit", async (event) => {
     todoForm.reset();
     inputDate.value = new Date().toLocaleDateString("sv-SE");
 
-    loadTodos();
+    loadTodos(currentFilter);
 }
 )
 
@@ -288,6 +347,20 @@ navItems.forEach(button => {
 
         })
         button.classList.add("active");
+        
+
+    })
+})
+
+//itemstateのactiveクラス付与
+const itemState=document.querySelectorAll(".item-state")
+console.log(itemState)
+itemState.forEach(button=>{
+    button.addEventListener("click",()=>{
+        itemState.forEach(item=>{
+            item.classList.remove("active")
+        })
+        button.classList.add("active")
         const status = button.dataset.filter;
         currentFilter = status;
 
@@ -296,8 +369,6 @@ navItems.forEach(button => {
     })
 })
 
-
-
 //05　初回表示
 //初期の日付を今日にする
 const inputDate = document.querySelector("#todo-date");
@@ -305,7 +376,7 @@ inputDate.value = new Date().toLocaleDateString("sv-SE");
 
 CountTodos()
 
-getWeather("平塚");
+getWeather("平塚","時間別");
 
 loadTodos(currentFilter);
 

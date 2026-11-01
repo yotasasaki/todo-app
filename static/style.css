@@ -368,7 +368,7 @@ select {
 
 
 /* ==================================================
-   7. 天気予報カード
+   7. 天気予報カード(時間)
 ================================================== */
 
 .card.weather-card {
@@ -462,39 +462,198 @@ select {
     font-variant-numeric: tabular-nums;
 }
 
+
+/* ==================================================
+   7. 天気予報カード(週間)
+================================================== */
+
+/* ========================================
+   週間天気全体
+======================================== */
+
+.weather-weekly-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+    margin-top: 12px;
+}
+
+
+/* ========================================
+   1日分のカード
+======================================== */
+
+.weather-weekly-card-each {
+    display: grid;
+    grid-template-columns: 22px 44px 30px minmax(0, 1fr) 42px 42px 34px;
+    align-items: center;
+    gap: 4px;
+
+    min-width: 0;
+    padding: 10px 8px;
+
+    border-radius: 14px;
+    background: #f5f8fd;
+
+    color: #718096;
+    font-size: 12px;
+}
+
+
+/* ========================================
+   曜日
+======================================== */
+
+.weekly-day {
+    color: #172033;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.weekly-day.day-6 {
+    color: #2777ed;
+}
+
+.weekly-day.day-0 {
+    color: #e54848;
+}
+
+
+/* ========================================
+   日付
+======================================== */
+
+.weekly-date {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ========================================
+   天気アイコン
+======================================== */
+
+.weekly-icon {
+    font-size: 21px;
+    line-height: 1;
+    text-align: center;
+}
+
+
+/* ========================================
+   天気の説明
+======================================== */
+
+.weekly-description {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 600;
+}
+
+
+/* ========================================
+   最低気温
+======================================== */
+
+.weekly-temp-min {
+    color: #718096;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ========================================
+   最高気温
+======================================== */
+
+.weekly-temp-max {
+    color: #172033;
+    font-weight: 700;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ========================================
+   降水確率
+======================================== */
+
+.weekly-rain {
+    color: #3478f6;
+    text-align: right;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
 /* 天気エリア切り替え */
-.weather-area-switch {
-    display: inline-flex;
+
+/* ========================================
+   天気エリア切り替え
+======================================== */
+
+/* 共通レイアウト */
+.weather-area-switch,
+.weather-span-switch {
+    display: flex;
     align-items: center;
     gap: 4px;
     padding: 4px;
     margin-top: 8px;
-
     background: #eef3fb;
     border-radius: 12px;
 }
 
+/* 地域切り替え */
+.weather-area-switch {
+    display: inline-flex;
+}
+
+/* 時間別・週間の切り替え */
+.weather-span-switch {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 /* 共通ボタン */
-.weather-area {
+.weather-area,
+.weather-span {
     border: none;
+    border-radius: 9px;
     background: transparent;
     color: #64748b;
-
     padding: 9px 20px;
-    border-radius: 9px;
-
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
-
     transition:
         background 0.2s ease,
         color 0.2s ease,
         box-shadow 0.2s ease;
 }
 
+/* 地域ボタン */
+.weather-area {
+    flex: 1;
+}
+
+/* 時間別・週間ボタン */
+.weather-span {
+    flex: 1;
+    text-align: center;
+}
+
 /* 選択中 */
-.weather-area.active {
+.weather-area.active,
+.weather-span.active {
     background: #ffffff;
     color: #2859b8;
     font-weight: 700;
@@ -502,9 +661,139 @@ select {
 }
 
 /* マウスを乗せたとき */
-.weather-area:not(.active):hover {
-    color: #2859b8;
+.weather-area:not(.active):hover,
+.weather-span:not(.active):hover {
     background: rgba(255, 255, 255, 0.6);
+    color: #2859b8;
+}
+
+
+/* ========================================
+   現在の天気
+======================================== */
+
+.weather-current {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.weather-current-info {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.weather-current-icon {
+    font-size: 48px;
+}
+
+.weather-current-details {
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+/* ==================================================
+   完了/未完了/すべて/切り替え
+================================================== */
+
+/* スイッチ全体 */
+.item-state-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    margin-top: 8px;
+    margin-bottom:8px;
+
+    width: fit-content;
+    max-width: 100%;
+
+    background: #ffffff;
+    border: 1px solid #d9e1ed;
+    border-radius: 14px;
+    box-sizing: border-box;
+}
+
+/* 各ボタン */
+.item-state {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    flex: 0 0 auto;
+
+    padding: 10px 20px;
+
+    border: 1px solid transparent;
+    border-radius: 10px;
+
+    background: transparent;
+    color: #64748b;
+
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+/* アイコン */
+.item-state-icon {
+    font-size: 18px;
+}
+
+/* 件数バッジ */
+.item-state .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+
+    border-radius: 50%;
+    background: #edf1f7;
+    color: #64748b;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* 選択中 */
+.item-state.active {
+    background: #ffffff;
+    border: 1px solid #3478f6;
+    color: #2859b8;
+    font-weight: 700;
+
+    box-shadow: 0 1px 3px rgba(30, 60, 100, 0.08);
+}
+
+/* 選択中のバッジ */
+.item-state.active .badge {
+    background: #e3edff;
+    color: #2859b8;
+}
+
+/* マウスオーバー */
+.item-state:not(.active):hover {
+    background: #f5f8fc;
+    color: #2859b8;
+}
+
+/* 空のバッジは非表示 */
+.item-state .badge:empty {
+    display: none;
 }
 
 
@@ -962,6 +1251,14 @@ select {
         font-size: 14px;
     }
 
+      .item-state {
+        justify-content: center;
+        gap: 6px;
+        min-height: 48px;
+        padding: 8px;
+        font-size: 13px;
+    }
+
     .category-section-mizushima h2,
     .category-section-okazaki h2,
     .category-section-mmth h2,
@@ -1050,6 +1347,11 @@ select {
     .form-bottom .add-button {
         height: 46px;
         font-size: 13px;
+    }
+    .item-state {
+        flex-wrap: wrap;
+        gap: 4px;
+        font-size: 12px;
     }
 
     .category-section-mizushima h2,
