@@ -5,6 +5,7 @@
 
 //01　初期設定・共通変数
 let currentFilter = "active";
+let currentProjectId=1;
 
 //02　Todo関連の関数
 //タスクの数をカウントし、各ナビゲーションに表示
@@ -24,12 +25,87 @@ async function CountTodos() {
 
 };
 //各タスクをDBから取得して表示
-async function loadTodos(status) {
-    const response = await fetch(status === "all" ? `/api/todos/` : `/api/todos/?status=${status}`);//ブラウザ(JavaScript)がサーバー(FastAPI)に /api/todos のデータをください、とHTTPリクエストを送る
-    const todos = await response.json();//サーバーから返ってきたJSON形式のデータをJavaScriptで扱えるデータに変換する
-    //const todoList = document.querySelector("#todo-list");
+async function loadTodos(status,projectId) {
+    const todosResponse = await fetch(status === "all" ? `/api/todos/` : `/api/todos/?status=${status}`);//ブラウザ(JavaScript)がサーバー(FastAPI)に /api/todos のデータをください、とHTTPリクエストを送る
+    const todos = await todosResponse.json();//サーバーから返ってきたJSON形式のデータをJavaScriptで扱えるデータに変換する
+    
+    const projectsResponse = await fetch("/api/projects/");//ブラウザ(JavaScript)がサーバー(FastAPI)に /api/todos のデータをください、とHTTPリクエストを送る
+    const projects = await projectsResponse.json();//サーバーから返ってきたJSON形式のデータをJavaScriptで扱えるデータに変換する
+    const casesResponse = await fetch("/api/cases/");//ブラウザ(JavaScript)がサーバー(FastAPI)に /api/todos のデータをください、とHTTPリクエストを送る
+    const cases = await casesResponse.json();//サーバーから返ってきたJSON形式のデータをJavaScriptで扱えるデータに変換する
+    
+    
+    const projectList=document.querySelector("#project-list");
+    projectList.innerHTML="";
 
-    const categoryContainers = {
+    projects.forEach(project=>{
+        let caseHTML = "";
+
+        const projectCases=cases.filter(caseItem=>caseItem.project_id==project.id);
+
+        projectCases.forEach(caseItem=>{
+            const caseTodos=todos.filter(todo=>todo.case_id==caseItem.id);
+
+            let todoHTML="";
+            caseTodos.forEach(todo=>{
+                todoHTML+=`
+                    <article class="todo-item">
+                        <input type="checkbox" ${todo.completed ? "checked" : ""}>
+                        <span>${todo.title}</span>
+                    </article>
+                `
+            });
+
+            caseHTML+=`
+            <section class="case-group">
+                <h3>${caseItem.name}</h3>
+                <div class="case-todos">
+                   ${todoHTML}
+                </div>
+            </section>
+            <button onclick="showAddTodo(${caseItem.id})">+タスクを追加</button>
+
+            <section class="add-todo-${caseItem.id}" hidden>
+              <input id="todo-title" class="todo-title" type="text">
+              <select id="todo-priority" class="todo-priority">
+               <option value="low">低</option>
+               <option value="medium" selected>中</option>
+               <option value="high">高</option>
+              </select>
+              <input id="edit-todo-date" class="todo-date" type="date" value="2026-10-06">
+              <button onclick="addTodo(${caseItem.id})">登録</button>
+              <button onclick="cancelTodo(${caseItem.id})">キャンセル</button>
+            </section>
+            
+            `
+
+
+        })
+        projectList.innerHTML+=`
+        <section class="project-group">
+          <h2>${project.name}</h2>
+          ${caseHTML}
+          <button onclick="showAddCase(${project.id})">＋案件を追加</button>
+          <section class="add-case-${project.id}" hidden>
+            <input id="case-name" class="case-name" type="text">
+            <textarea class="case-description"></textarea>
+            <button onclick="addCase(${project.id})">登録</button>
+            <button onclick="cancelCase(${project.id})">キャンセル</button>
+          </section>
+
+        </section>`;
+
+
+
+
+    })
+
+
+
+
+
+
+    const projectCategoryContainers = {
 
         "MMC-水島": document.querySelector("#mmc-mizushima-list"),
         "MMC-岡崎": document.querySelector("#mmc-okazaki-list"),
@@ -46,7 +122,7 @@ async function loadTodos(status) {
 
     //innnerHTMLはhtmlの内容を直接書き換える
     //todoList.innerHTML = "";
-    Object.values(categoryContainers).forEach(container => {
+    Object.values(projectCategoryContainers).forEach(container => {
         container.innerHTML = "";
     });
     //todosという連続した値を一つずつ取り出して一つをtodoという名前で扱う
@@ -57,7 +133,7 @@ async function loadTodos(status) {
             completedClass = "completed"
         }
 
-        const todoList = categoryContainers[todo.category];
+        const todoList = projectCategoryContainers[todo.project_name];
 
 
 
@@ -67,7 +143,7 @@ async function loadTodos(status) {
             <input class="checkbox" data-todo-id=${todo.id} onchange="checkDone(this)" type="checkbox">
             <h3 class="todo-title">${todo.title}</h3>
             <p>${todo.priority}</p>
-            <p>${todo.category}</p>
+            <p>${todo.project_name}</p>
             <p>${todo.due_date}</p>
             <button onclick="editTodo(${todo.id})">編集</button>
             <button onclick="deleteTodo(${todo.id})">削除</button>
@@ -101,6 +177,44 @@ async function loadTodos(status) {
 
 
 }
+
+async function createProjectTabs(){
+    const projectsResponse = await fetch("/api/projects/");
+    const projects = await projectsResponse.json();
+    const tabs=document.querySelector(".project-switch")
+    tabs.innerHTML="";
+    projects.forEach(project=>{
+
+        const activeClass=project.id==currentProjectId?"active":""
+
+        tabs.innerHTML+=`
+        <button class="project-tab ${activeClass}" data-filter=${project.id} onclick="selectProject(${project.id})">${project.name}</button>
+        
+        `
+    })
+
+}
+createProjectTabs()
+
+const projectTabs=document.querySelectorAll(".project-tab")
+projectTabs.forEach(button=>{
+    button.addEventListener("click",()=>{
+        projectTabs.forEach(item=>{
+            item.classList.remove("active")
+        })
+        button.classList.add("active")
+        currentProjectId = button.dataset.filter;
+
+    })
+})
+
+
+function selectProject(projectId) {
+    console.log("テスト")
+
+}
+
+
 //タスク削除
 async function deleteTodo(todoId) {
     const response = await fetch(`/api/todos/${todoId}`, {
@@ -176,6 +290,70 @@ async function editTodo(todoId) {
 
 
 }
+
+function showAddCase(projectId){
+    const addCase=document.querySelector(`.add-case-${projectId}`)
+    addCase.hidden=false
+}
+
+function cancelCase(projectId){
+    const addCase=document.querySelector(`.add-case-${projectId}`)
+    addCase.hidden=true
+}
+
+async function addCase(projectId){
+    const editCase=document.querySelector(`.add-case-${projectId}`)
+    const name=editCase.querySelector(".case-name").value
+    const description=editCase.querySelector(".case-description").value
+    const response=await fetch(`/api/cases/?project_id=${projectId}`,{
+        method:"POST",
+        headers: { "Content-Type": "application/json" },
+        body:JSON.stringify({
+            name:name,
+            description:description,
+            project_id:projectId
+        })
+
+    
+
+    })
+    console.log(response)
+    loadTodos(currentFilter);
+
+}
+
+function showAddTodo(caseId){
+    const addTodo=document.querySelector(`.add-todo-${caseId}`)
+    addTodo.hidden=false
+}
+function cancelTodo(caseId){
+    const addTodo=document.querySelector(`.add-todo-${caseId}`)
+    addTodo.hidden=true
+}
+async function addTodo(caseId){
+    const editTodo=document.querySelector(`.add-todo-${caseId}`)
+    const title=editTodo.querySelector(".todo-title").value
+    const priority=editTodo.querySelector(".todo-priority").value
+    const dueDate = editTodo.querySelector(".todo-date").value;
+    const response=await fetch(`/api/todos/?case_id=${caseId}`,{
+        method:"POST",
+        headers: { "Content-Type": "application/json" },
+        body:JSON.stringify({
+            title:title,
+            priority:priority,
+            due_date:dueDate,
+            case_id:caseId
+        })
+
+    
+
+    })
+    console.log(response)
+    loadTodos(currentFilter);
+
+}
+
+
 
 
 //03　天気関連の関数
