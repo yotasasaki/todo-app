@@ -201,7 +201,7 @@ p {
 ================================================== */
 .top-content {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-columns: minmax(0, 1fr);
     align-items: stretch;
     gap: 20px;
     margin-bottom: 28px;
@@ -392,7 +392,8 @@ p {
 }
 
 .weather-span-switch {
-    width: 100%;
+    width: 420px;
+    max-width: 100%;
 }
 
 .weather-area,
@@ -821,45 +822,130 @@ p {
     text-decoration: line-through;
 }
 
+
 /* ==================================================
-   10. Existing Todo edit form
+   10. Todo edit form
 ================================================== */
-.edit-item {
-    display: flex;
-    flex-wrap: wrap;
+
+.todo-edit-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 110px 190px auto auto;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+
+    width: 100%;
     min-width: 0;
-    margin-top: -2px;
+    margin: 8px 0 12px;
     padding: 16px;
+
     border: 1px solid #d8e5f8;
-    border-radius: 13px;
+    border-radius: 12px;
     background: #f8faff;
 }
 
-.edit-item .todo-input {
-    flex: 1 1 220px;
-    width: auto;
-}
-
-.edit-item select {
+/* タスク名 */
+.todo-edit-item > input[type="text"],
+.todo-edit-item > .todo-input {
+    width: 100%;
     height: 44px;
-    padding: 0 10px;
+    min-width: 0;
+    padding: 0 14px;
+
     border: 1px solid #d8e2f0;
     border-radius: 9px;
     background: #fff;
+
+    color: #263248;
+    font-size: 14px;
+}
+
+/* 優先度 */
+.todo-edit-item > select {
+    width: 100%;
+    height: 44px;
+    padding: 0 10px;
+
+    border: 1px solid #d8e2f0;
+    border-radius: 9px;
+    background: #fff;
+
+    color: #334155;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* 期限 */
+.todo-edit-item > input[type="date"],
+.todo-edit-item > .date-input {
+    width: 100%;
+    height: 44px;
+    min-width: 0;
+    padding: 0 10px;
+
+    border: 1px solid #d8e2f0;
+    border-radius: 9px;
+    background: #fff;
+
+    color: #334155;
     font-size: 13px;
 }
 
-.edit-item .date-input {
-    flex: 0 1 160px;
-    width: auto;
-    height: 44px;
+/* ボタン共通 */
+.todo-edit-item > button {
+    height: 40px;
+    padding: 0 16px;
+
+    border: 1px solid #d8e2f0;
+    border-radius: 8px;
+    background: #fff;
+
+    color: #35445b;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+
+    transition: 0.18s ease;
 }
 
-.edit-item button {
-    min-height: 44px;
-    padding: 8px 14px;
+/* 更新 */
+.todo-edit-item > button:first-of-type {
+    border-color: #3478f6;
+    background: #3478f6;
+    color: #fff;
+}
+
+.todo-edit-item > button:first-of-type:hover {
+    background: #176de5;
+}
+
+/* キャンセル */
+.todo-edit-item > button:last-of-type:hover {
+    background: #edf3ff;
+    border-color: #b9d2fa;
+}
+
+/* 入力フォーカス */
+.todo-edit-item input:focus,
+.todo-edit-item select:focus {
+    outline: none;
+    border-color: #3478f6;
+    box-shadow: 0 0 0 3px rgba(52, 120, 246, 0.12);
+}
+
+/* スマートフォン */
+@media (max-width: 768px) {
+    .todo-edit-item {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .todo-edit-item > input[type="text"],
+    .todo-edit-item > .todo-input,
+    .todo-edit-item > input[type="date"],
+    .todo-edit-item > .date-input {
+        grid-column: 1 / -1;
+    }
 }
 
 /* ==================================================
@@ -1458,3 +1544,177 @@ p {
         width: 100%;
     }
 }
+
+
+/* ==================================================
+   Project Tabs
+================================================== */
+
+.project-switch {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    width: fit-content;
+    max-width: 100%;
+
+    margin: 8px 0 14px;
+    padding: 5px;
+
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.project-switch::-webkit-scrollbar {
+    display: none;
+}
+
+.project-tab {
+    flex: 0 0 auto;
+
+    padding: 10px 16px;
+
+    border: 1px solid transparent;
+    border-radius: 9px;
+
+    background: transparent;
+    color: #64748b;
+
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    transition: all 0.2s ease;
+}
+
+.project-tab:hover {
+    background: #f0f5fc;
+    color: var(--color-primary-dark);
+}
+
+.project-tab.active {
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    font-weight: 700;
+}
+
+@media (max-width: 900px) {
+    .project-switch {
+        width: 100%;
+    }
+
+    .project-tab {
+        padding: 9px 13px;
+        font-size: 13px;
+    }
+}
+
+
+/* Case header */
+.case-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 14px;
+}
+
+.case-top h3 {
+    margin: 0;
+}
+
+/* Menu container */
+.case-menu {
+    position: relative;
+}
+
+/* Three-dot button */
+.case-menu-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    background: transparent;
+    color: #64748b;
+
+    font-size: 23px;
+    line-height: 1;
+
+    transition: background 0.18s ease;
+}
+
+.case-menu-trigger:hover {
+    background: #edf3ff;
+    color: #3478f6;
+}
+
+/* Dropdown menu */
+.case-operation-button {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    z-index: 20;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    min-width: 130px;
+    padding: 6px;
+
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    box-shadow: 0 6px 18px rgba(30, 50, 90, 0.12);
+}
+
+/* Common action button */
+.case-operation-button button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    width: 100%;
+    padding: 9px 12px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: transparent;
+
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+
+    transition: background 0.18s ease;
+}
+
+/* Complete */
+.case-action-complete {
+    color: #15803d;
+}
+
+.case-action-complete:hover {
+    background: #f0fdf4;
+}
+
+/* Delete */
+.case-action-delete {
+    color: #dc2626;
+}
+
+.case-action-delete:hover {
+    background: #fef2f2;
+}
+

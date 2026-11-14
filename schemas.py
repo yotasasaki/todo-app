@@ -22,3 +22,7 @@ class CaseUpdate(BaseModel):
     name: str
     description: str
     project_id: int
+    
+class CaseCompleteUpdate(BaseModel):
+    completed:bool    
+    

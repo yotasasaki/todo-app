@@ -5,7 +5,8 @@
 
 //01　初期設定・共通変数
 let currentFilter = "active";
-let currentProjectId=1;
+let currentProjectId = 1;
+const today = new Date().toLocaleDateString("sv-SE");
 
 //02　Todo関連の関数
 //タスクの数をカウントし、各ナビゲーションに表示
@@ -25,40 +26,68 @@ async function CountTodos() {
 
 };
 //各タスクをDBから取得して表示
-async function loadTodos(status,projectId) {
+async function loadTodos(status, projectId) {
     const todosResponse = await fetch(status === "all" ? `/api/todos/` : `/api/todos/?status=${status}`);//ブラウザ(JavaScript)がサーバー(FastAPI)に /api/todos のデータをください、とHTTPリクエストを送る
     const todos = await todosResponse.json();//サーバーから返ってきたJSON形式のデータをJavaScriptで扱えるデータに変換する
-    
+
     const projectsResponse = await fetch("/api/projects/");//ブラウザ(JavaScript)がサーバー(FastAPI)に /api/todos のデータをください、とHTTPリクエストを送る
     const projects = await projectsResponse.json();//サーバーから返ってきたJSON形式のデータをJavaScriptで扱えるデータに変換する
     const casesResponse = await fetch("/api/cases/");//ブラウザ(JavaScript)がサーバー(FastAPI)に /api/todos のデータをください、とHTTPリクエストを送る
     const cases = await casesResponse.json();//サーバーから返ってきたJSON形式のデータをJavaScriptで扱えるデータに変換する
-    
-    
-    const projectList=document.querySelector("#project-list");
-    projectList.innerHTML="";
 
-    projects.forEach(project=>{
-        let caseHTML = "";
 
-        const projectCases=cases.filter(caseItem=>caseItem.project_id==project.id);
+    const projectList = document.querySelector("#project-list");
+    projectList.innerHTML = "";
 
-        projectCases.forEach(caseItem=>{
-            const caseTodos=todos.filter(todo=>todo.case_id==caseItem.id);
 
-            let todoHTML="";
-            caseTodos.forEach(todo=>{
-                todoHTML+=`
-                    <article class="todo-item">
-                        <input type="checkbox" ${todo.completed ? "checked" : ""}>
+    let caseHTML = "";
+    const project = projects.find(projectItem => projectItem.id == projectId);
+    console.log(project)
+    const projectCases = cases.filter(caseItem => caseItem.project_id == projectId&&caseItem.completed==false);
+
+    projectCases.forEach(caseItem => {
+        const caseTodos = todos.filter(todo => todo.case_id == caseItem.id);
+
+        let todoHTML = "";
+        caseTodos.forEach(todo => {
+            todoHTML += `
+                    <article class="todo-item" id="todo-item-${todo.id}">
+                        <input type="checkbox" onchange="checkDone(this)" data-todo-id=${todo.id} ${todo.completed ? "checked" : ""}>
                         <span>${todo.title}</span>
+                        <p>${todo.priority}</p>
+                        <p>${todo.due_date}</p>
+                        <button onclick="editTodo(${todo.id})">編集</button>
+                        <button onclick="deleteTodo(${todo.id})">削除</button>
+                    </article>
+                    <article class="todo-edit-item" hidden id="todo-edit-item-${todo.id}" >
+                        <input id="edit-todo-title" class="todo-input" type="text" placeholder="やることを入力してください..." autocomplete="off">
+                        <select id="edit-todo-priority">
+                          <option value="low">低</option>
+                          <option value="medium" selected>中</option>
+                          <option value="high">高</option>
+                        </select>
+                        <input id="edit-todo-date" class="date-input" type="date" value=${today}>
+                        <button onclick="updateTodo(${todo.id})">更新</button>
+                        <button onclick="cancelTodo(${todo.id})">キャンセル</button>
                     </article>
                 `
-            });
+        });
 
-            caseHTML+=`
+        caseHTML += `
             <section class="case-group">
-                <h3>${caseItem.name}</h3>
+                <div class="case-top">
+                    <h3>${caseItem.name}</h3>
+
+                    <div class="case-menu">
+                        <button class="case-menu-trigger" onclick="showCaseDeleteorCompleted(${caseItem.id})">⋮</button>
+                        <div class="case-operation-button case-operation-button-${caseItem.id}" hidden>
+                          <button class="case-action-complete" onclick="caseCompleted(${caseItem.id})">完了</button>
+                          <button class="case-action-delete" onclick="caseDelete(${caseItem.id})">削除</button>
+                  
+                        </div>
+                    </div>
+
+                </div>
                 <div class="case-todos">
                    ${todoHTML}
                 </div>
@@ -72,16 +101,16 @@ async function loadTodos(status,projectId) {
                <option value="medium" selected>中</option>
                <option value="high">高</option>
               </select>
-              <input id="edit-todo-date" class="todo-date" type="date" value="2026-10-06">
+              <input id="edit-todo-date" class="todo-date" type="date" value=${today}>
               <button onclick="addTodo(${caseItem.id})">登録</button>
-              <button onclick="cancelTodo(${caseItem.id})">キャンセル</button>
+              <button onclick="cancelAddTodo(${caseItem.id})">キャンセル</button>
             </section>
             
             `
 
 
-        })
-        projectList.innerHTML+=`
+    })
+    projectList.innerHTML += `
         <section class="project-group">
           <h2>${project.name}</h2>
           ${caseHTML}
@@ -98,13 +127,13 @@ async function loadTodos(status,projectId) {
 
 
 
-    })
 
 
 
 
 
 
+    /*
     const projectCategoryContainers = {
 
         "MMC-水島": document.querySelector("#mmc-mizushima-list"),
@@ -171,35 +200,36 @@ async function loadTodos(status,projectId) {
             </article>`;
 
     });
+    */
 
 
 
 
 
 }
-
-async function createProjectTabs(){
+//プロジェクト切り替えのタブ生成
+async function createProjectTabs() {
     const projectsResponse = await fetch("/api/projects/");
     const projects = await projectsResponse.json();
-    const tabs=document.querySelector(".project-switch")
-    tabs.innerHTML="";
-    projects.forEach(project=>{
+    const tabs = document.querySelector(".project-switch")
+    tabs.innerHTML = "";
+    projects.forEach(project => {
 
-        const activeClass=project.id==currentProjectId?"active":""
+        const activeClass = project.id == currentProjectId ? "active" : ""
 
-        tabs.innerHTML+=`
-        <button class="project-tab ${activeClass}" data-filter=${project.id} onclick="selectProject(${project.id})">${project.name}</button>
+        tabs.innerHTML += `
+        <button class="project-tab ${activeClass}" data-filter=${project.id} onclick="selectProject(${project.id},this)">${project.name}</button>
         
         `
     })
 
 }
-createProjectTabs()
 
-const projectTabs=document.querySelectorAll(".project-tab")
-projectTabs.forEach(button=>{
-    button.addEventListener("click",()=>{
-        projectTabs.forEach(item=>{
+/*
+const projectTabs = document.querySelectorAll(".project-tab")
+projectTabs.forEach(button => {
+    button.addEventListener("click", () => {
+        projectTabs.forEach(item => {
             item.classList.remove("active")
         })
         button.classList.add("active")
@@ -207,15 +237,68 @@ projectTabs.forEach(button=>{
 
     })
 })
+*/
 
+//プロジェクトタブ選択したときのfunction
+function selectProject(projectId, button) {
+    // 選択中のプロジェクトIDを更新
+    currentProjectId = projectId;
 
-function selectProject(projectId) {
-    console.log("テスト")
+    // 全タブからactiveを外す
+    const projectTabs = document.querySelectorAll(".project-tab");
+
+    projectTabs.forEach(tab => {
+        tab.classList.remove("active");
+    });
+
+    // 押したタブだけactive
+    button.classList.add("active");
+
+    // 押したプロジェクトを表示
+    loadTodos(currentFilter, currentProjectId);
+}
+//CASEの削除と完了のボタンを表示
+function showCaseDeleteorCompleted(caseId){
+    const caseOperationButton=document.querySelector(`.case-operation-button-${caseId}`)
+    caseOperationButton.hidden = !caseOperationButton.hidden;
 
 }
+//CASEの完了押したときの処理           
+async function caseCompleted(caseId){
+    const response=await fetch(`/api/cases/${caseId}/complete`,{
+        method:"PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            completed: true,
+        })
+    })
 
+    await loadTodos(currentFilter, currentProjectId);
+    
+    
+}
+//CASEの削除押したときの処理   
+async function caseDelete(caseId){
+    const responseTodo=await fetch(`/api/cases/${caseId}/todos`,{
+        method:"DELETE"
+    });
+    if (!responseTodo.ok) {
+        alert("削除に失敗しました");
+        return;
+    }
+    
+    const responseCase=await fetch(`/api/cases/${caseId}`,{
+        method:"DELETE"
+    });
+    if (!responseCase.ok) {
+        alert("削除に失敗しました");
+        return;
+    }
 
-//タスク削除
+    loadTodos(currentFilter, currentProjectId);
+
+}
+//todo削除
 async function deleteTodo(todoId) {
     const response = await fetch(`/api/todos/${todoId}`, {
         method: "DELETE"
@@ -226,14 +309,13 @@ async function deleteTodo(todoId) {
         return;
     }
 
-    loadTodos();
+    loadTodos(currentFilter, currentProjectId);
 }
-//編集したタスクを登録
+//編集したtodoを登録
 async function updateTodo(todoId) {
     const editItem = document.querySelector(`#todo-edit-item-${todoId}`);
-    const title = editItem.querySelector("#todo-title").value;
-    const priority = editItem.querySelector("#todo-priority").value;
-    const category = editItem.querySelector("#todo-category").value;
+    const title = editItem.querySelector("#edit-todo-title").value;
+    const priority = editItem.querySelector("#edit-todo-priority").value;
     const dueDate = editItem.querySelector("#edit-todo-date").value;
 
 
@@ -243,24 +325,24 @@ async function updateTodo(todoId) {
         body: JSON.stringify({
             title: title,
             priority: priority,
-            category: category,
             due_date: dueDate
         })
     });
-    loadTodos(currentFilter);
+    loadTodos(currentFilter, currentProjectId);
 
 
 
 
 
 }
-//編集のキャンセル
+//todo編集のキャンセル
 async function cancelTodo(todoId) {
     const editItem = document.querySelector(`#todo-edit-item-${todoId}`);
     const todoItem = document.querySelector(`#todo-item-${todoId}`);
     editItem.hidden = true;
+    todoItem.hidden = false; // 追加：元のTodoを隠す
 }
-//チェックいれてタスクを完了済みにする
+//チェックいれてtodoを完了済みにする
 async function checkDone(checkbox) {
     if (checkbox.checked) {
         const response = await fetch(`/api/todos/${checkbox.dataset.todoId}`, {
@@ -269,87 +351,91 @@ async function checkDone(checkbox) {
         })
 
 
-        await loadTodos(currentFilter)
+        await loadTodos(currentFilter, currentProjectId);
 
     }
 
 }
-//タスクの編集
+//todoの編集
 async function editTodo(todoId) {
     const editItem = document.querySelector(`#todo-edit-item-${todoId}`);
     const todoItem = document.querySelector(`#todo-item-${todoId}`);
 
-
     editItem.hidden = false;
+    todoItem.hidden = true; // 追加：元のTodoを隠す
+    console.log("todoId:", todoId);
+    console.log("editItem:", editItem);
+    console.log("todoItem:", todoItem);
 
-    editItem.querySelector("#todo-title").value = todoItem.querySelector("h3").textContent;
-    editItem.querySelector("#todo-priority").value = todoItem.querySelectorAll("p")[0].textContent;
-    editItem.querySelector("#todo-category").value = todoItem.querySelectorAll("p")[1].textContent;
-    editItem.querySelector("#edit-todo-date").value = todoItem.querySelectorAll("p")[2].textContent;
+    editItem.querySelector("#edit-todo-title").value = todoItem.querySelector("span").textContent;
+    editItem.querySelector("#edit-todo-priority").value = todoItem.querySelectorAll("p")[0].textContent;
+    editItem.querySelector("#edit-todo-date").value = todoItem.querySelectorAll("p")[1].textContent;
 
 
 
 }
-
-function showAddCase(projectId){
-    const addCase=document.querySelector(`.add-case-${projectId}`)
-    addCase.hidden=false
+//新規CASE追加のUI表示
+function showAddCase(projectId) {
+    const addCase = document.querySelector(`.add-case-${projectId}`)
+    addCase.hidden = false
 }
-
-function cancelCase(projectId){
-    const addCase=document.querySelector(`.add-case-${projectId}`)
-    addCase.hidden=true
+//新規CASE追加のUI非表示切り替え
+function cancelCase(projectId) {
+    const addCase = document.querySelector(`.add-case-${projectId}`)
+    addCase.hidden = true
 }
-
-async function addCase(projectId){
-    const editCase=document.querySelector(`.add-case-${projectId}`)
-    const name=editCase.querySelector(".case-name").value
-    const description=editCase.querySelector(".case-description").value
-    const response=await fetch(`/api/cases/?project_id=${projectId}`,{
-        method:"POST",
+//新規CASE追加実行
+async function addCase(projectId) {
+    const editCase = document.querySelector(`.add-case-${projectId}`)
+    const name = editCase.querySelector(".case-name").value
+    const description = editCase.querySelector(".case-description").value
+    const response = await fetch(`/api/cases/?project_id=${projectId}`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:JSON.stringify({
-            name:name,
-            description:description,
-            project_id:projectId
+        body: JSON.stringify({
+            name: name,
+            description: description,
+            project_id: projectId
         })
 
-    
+
 
     })
     console.log(response)
-    loadTodos(currentFilter);
+    loadTodos(currentFilter, currentProjectId);
 
 }
-
-function showAddTodo(caseId){
-    const addTodo=document.querySelector(`.add-todo-${caseId}`)
-    addTodo.hidden=false
+//新規todo追加のUI表示
+function showAddTodo(caseId) {
+    const addTodo = document.querySelector(`.add-todo-${caseId}`)
+    addTodo.hidden = false
 }
-function cancelTodo(caseId){
-    const addTodo=document.querySelector(`.add-todo-${caseId}`)
-    addTodo.hidden=true
+//新規todo追加のUI非表示切り替え
+function cancelAddTodo(caseId) {
+    const addTodo = document.querySelector(`.add-todo-${caseId}`)
+    addTodo.hidden = true
 }
-async function addTodo(caseId){
-    const editTodo=document.querySelector(`.add-todo-${caseId}`)
-    const title=editTodo.querySelector(".todo-title").value
-    const priority=editTodo.querySelector(".todo-priority").value
+//新規todo追加実行
+async function addTodo(caseId) {
+    const editTodo = document.querySelector(`.add-todo-${caseId}`)
+    const title = editTodo.querySelector(".todo-title").value
+    const priority = editTodo.querySelector(".todo-priority").value
     const dueDate = editTodo.querySelector(".todo-date").value;
-    const response=await fetch(`/api/todos/?case_id=${caseId}`,{
-        method:"POST",
+    const response = await fetch(`/api/todos/?case_id=${caseId}`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:JSON.stringify({
-            title:title,
-            priority:priority,
-            due_date:dueDate,
-            case_id:caseId
+        body: JSON.stringify({
+            title: title,
+            priority: priority,
+            due_date: dueDate,
+            case_id: caseId
         })
 
-    
+
 
     })
     console.log(response)
-    loadTodos(currentFilter);
+    loadTodos(currentFilter, currentProjectId);
 
 }
 
@@ -357,6 +443,7 @@ async function addTodo(caseId){
 
 
 //03　天気関連の関数
+
 //天気情報を取得して表示
 async function getWeather(location, span) {
     const response = await fetch(`/api/get-weather/?location=${location}&span=${span}`, {
@@ -402,9 +489,9 @@ async function getWeather(location, span) {
     const weatherWeeklyCard = document.querySelector(".weather-weekly-card");
 
     if (span == "時間別") {
-        weatherHourlyCard.hidden=false;
-        weatherWeeklyCard.hidden=true;
-        
+        weatherHourlyCard.hidden = false;
+        weatherWeeklyCard.hidden = true;
+
         weatherHourlyCard.innerHTML = "";
         for (let i = 0; i < 24; i++) {
             weatherHourlyCard.innerHTML += `
@@ -418,13 +505,13 @@ async function getWeather(location, span) {
         }
 
 
-    }else if(span=="週間"){
-        weatherHourlyCard.hidden=true;
-        weatherWeeklyCard.hidden=false;
+    } else if (span == "週間") {
+        weatherHourlyCard.hidden = true;
+        weatherWeeklyCard.hidden = false;
 
-        
 
-        
+
+
         weatherWeeklyCard.innerHTML = "";
         for (let i = 0; i < 7; i++) {
             const date = weather.data.daily.time[i];
@@ -463,8 +550,8 @@ weatherAreas.forEach(button => {
         })
         button.classList.add("active")
 
-        const activeSpan=document.querySelector(".weather-span.active")
-        getWeather(button.dataset.filter,activeSpan.dataset.filter)
+        const activeSpan = document.querySelector(".weather-span.active")
+        getWeather(button.dataset.filter, activeSpan.dataset.filter)
 
 
     })
@@ -479,8 +566,8 @@ weatherSpans.forEach(button => {
         })
         button.classList.add("active")
 
-        const activeLocation=document.querySelector(".weather-area.active")
-        getWeather(activeLocation.dataset.filter,button.dataset.filter)
+        const activeLocation = document.querySelector(".weather-area.active")
+        getWeather(activeLocation.dataset.filter, button.dataset.filter)
 
 
 
@@ -488,9 +575,10 @@ weatherSpans.forEach(button => {
 })
 
 //新規FormをHttp Postで送る
+/*
 const todoForm = document.querySelector("#todo-form")
 todoForm.addEventListener("submit", async (event) => {
-    
+
     event.preventDefault();//これによりページを再読み込みせずに処理できる、ユーザーが操作している画面を維持したまま、必要なデータだけ更新できるというのがメリット。
     const title = document.querySelector("#todo-title").value;
     const priority = document.querySelector("#todo-priority").value;
@@ -513,7 +601,7 @@ todoForm.addEventListener("submit", async (event) => {
     loadTodos(currentFilter);
 }
 )
-
+*/
 //ナビゲーションのactiveクラス付与
 const navItems = document.querySelectorAll(".nav-item")
 //どれか押されたら、すべてからactiveクラスを外す。
@@ -525,24 +613,24 @@ navItems.forEach(button => {
 
         })
         button.classList.add("active");
-        
+
 
     })
 })
 
 //itemstateのactiveクラス付与
-const itemState=document.querySelectorAll(".item-state")
+const itemState = document.querySelectorAll(".item-state")
 console.log(itemState)
-itemState.forEach(button=>{
-    button.addEventListener("click",()=>{
-        itemState.forEach(item=>{
+itemState.forEach(button => {
+    button.addEventListener("click", () => {
+        itemState.forEach(item => {
             item.classList.remove("active")
         })
         button.classList.add("active")
         const status = button.dataset.filter;
         currentFilter = status;
 
-        loadTodos(currentFilter);
+        loadTodos(currentFilter, currentProjectId);
 
     })
 })
@@ -550,26 +638,19 @@ itemState.forEach(button=>{
 //05　初回表示
 //初期の日付を今日にする
 const inputDate = document.querySelector("#todo-date");
-inputDate.value = new Date().toLocaleDateString("sv-SE");
+//inputDate.value = new Date().toLocaleDateString("sv-SE");
 
+
+
+createProjectTabs()
 CountTodos()
-
-getWeather("平塚","時間別");
-
-loadTodos(currentFilter);
+getWeather("平塚", "時間別");
+loadTodos(currentFilter,currentProjectId);
 
 
 
-/*
-function applyCompletedStyle(){
-    const todoItems=document.querySelectorAll(".todo-item");
-    console.log("Todo件数:", todoItems.length);
-    todoItems.forEach(todo=>{
-        todo.classList.add("completed");
-        console.log(todo.className);
-    });
-}
-*/
+
+
 
 
 

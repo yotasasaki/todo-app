@@ -37,6 +37,7 @@ class Case(Base):
     description: Mapped[str| None] = mapped_column(Text,nullable=True)
     created_at: Mapped[datetime | None] = mapped_column(DateTime,server_default=func.now())
     completed_at: Mapped[datetime | None] = mapped_column(DateTime,nullable=True)
+    completed:Mapped[bool] = mapped_column(Boolean, default=False)
     project: Mapped["Project"] = relationship(back_populates="cases")
     todos: Mapped[list["Todo"]] = relationship(back_populates="case")
     
